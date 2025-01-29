@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { fetchUserData, handleClick } from "./utils/api"; // Import API functions
 
 const App = () => {
   const [username, setUsername] = useState("");
@@ -10,22 +10,22 @@ const App = () => {
 
   useEffect(() => {
     if (enteredUsername) {
-      axios.get(`http://localhost:5000/api/users/${enteredUsername}`).then((response) => {
-        setCounter(response.data.counter);
-        setRewards(response.data.rewards);
+      fetchUserData(enteredUsername).then((data) => {
+        setCounter(data.counter);
+        setRewards(data.rewards);
       });
     }
   }, [enteredUsername]);
 
-  const handleClick = async () => {
-    const response = await axios.post(`http://localhost:5000/api/users/${enteredUsername}/click`);
-    setCounter(response.data.counter);
-    setRewards(response.data.rewards);
+  const handleClickButton = async () => {
+    const data = await handleClick(enteredUsername);
+    setCounter(data.counter);
+    setRewards(data.rewards);
 
-    if (response.data.prize > 0) {
+    if (data.prize > 0) {
       setMessage("🎉 You won a prize!");
-    } else if (response.data.points > 0) {
-      setMessage(`✨ Bonus! +${response.data.points} points`);
+    } else if (data.points > 0) {
+      setMessage(`✨ Bonus! +${data.points} points`);
     } else {
       setMessage("");
     }
@@ -54,7 +54,7 @@ const App = () => {
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-4 text-[#16262E]">Clicker Game</h1>
           <button
-            onClick={handleClick}
+            onClick={handleClickButton}
             className="px-6 py-3 bg-[#006064] text-white rounded-lg shadow-lg hover:bg-[#087F8C] transition"
           >
             Click Me!
